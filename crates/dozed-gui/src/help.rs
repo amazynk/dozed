@@ -1008,6 +1008,9 @@ pub const THAW_ALL: &str = "Restore every app now. Ignores rules, ignores mode, 
      the window has given up — the one button that has to work when something has gone \
      wrong.";
 
+pub const DISCORD: &str = "Ask a question or talk to the people who make dozed. Opens the community's \
+     Discord in your browser: the dashboard itself fetches nothing.";
+
 pub const RELOAD: &str = "Re-read `config.toml` from disk and apply it, without restarting the daemon or \
      dropping what it is holding. The same thing `dozectl reload` does.";
 

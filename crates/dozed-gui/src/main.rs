@@ -78,6 +78,13 @@ const GLOBAL_MODES: [(Mode, &str, &str); 2] = [
     (Mode::Live, "Live — actually freeze and throttle", help::GO_LIVE),
 ];
 
+/// Where the footer's Discord button goes.
+///
+/// A page on the project's website that forwards to the current invite, so the
+/// invite can change without a release. No query and no fragment: nothing that
+/// could say who clicked.
+const DISCORD_URL: &str = "https://amazynk.com/discord/";
+
 /// The snooze lengths the header offers, shortest first.
 ///
 /// A named constant for the same reason [`GLOBAL_MODES`] is: it is the whole of
@@ -577,81 +584,95 @@ impl eframe::App for Gui {
 
         egui::TopBottomPanel::bottom("footer").show(ctx, |ui| {
             ui.add_space(4.0);
-            ui.horizontal(|ui| {
-                let connection = if snapshot.connected {
-                    ui.colored_label(egui::Color32::from_rgb(120, 180, 120), "connected")
-                } else {
-                    ui.colored_label(egui::Color32::from_rgb(220, 120, 60), "no daemon")
-                };
-                connection.explain(help::connection(snapshot.connected));
-                if let Some(s) = &snapshot.status {
-                    ui.separator();
-                    // A battery tool that cannot show its own cost is asking to
-                    // be taken on faith (§13).
-                    ui.label(format!("own cost {:.1} wakeups/s", s.self_wakeups_per_sec))
-                        .explain(help::self_cost(s));
-                    // A recorder that stopped is a fault and says so louder; a
-                    // recorder that is running still says how much it has, because
-                    // the size it reports goes *down* when it breaks and that is
-                    // only legible against a number you have been watching.
-                    if let Some(t) = &s.trace {
-                        match &t.stopped {
-                            // Present tense, and it clears itself: the daemon
-                            // retries every minute, so this describes what is
-                            // wrong now rather than what went wrong once.
-                            Some(why) => {
-                                ui.separator();
-                                ui.label(
-                                    egui::RichText::new(if t.retrying {
-                                        format!("recording stopped: {why} (retrying)")
-                                    } else {
-                                        format!("recording stopped: {why}")
-                                    })
-                                    .color(egui::Color32::from_rgb(220, 120, 120)),
-                                )
-                                .explain(help::trace(t));
-                            }
-                            // A recorder that recovered is healthy and its file
-                            // still has a hole. Two different facts, and only the
-                            // first of them stops being true.
-                            None if t.gaps > 0 => {
-                                ui.separator();
-                                ui.label(
-                                    egui::RichText::new(format!(
-                                        "recording {} events, {} gap{}",
-                                        t.records,
-                                        t.gaps,
-                                        if t.gaps == 1 { "" } else { "s" }
-                                    ))
-                                    .color(egui::Color32::from_rgb(210, 170, 90)),
-                                )
-                                .explain(help::trace(t));
-                            }
-                            None => {
-                                ui.separator();
-                                ui.label(format!("recording {} events", t.records))
+            // The button is laid out first and the strip gets what is left,
+            // cut short rather than drawn over it. The header's two sides
+            // overlap when they meet; this row does not repeat that.
+            egui::Sides::new().shrink_left().truncate().show(
+                ui,
+                |ui| {
+                    let connection = if snapshot.connected {
+                        ui.colored_label(egui::Color32::from_rgb(120, 180, 120), "connected")
+                    } else {
+                        ui.colored_label(egui::Color32::from_rgb(220, 120, 60), "no daemon")
+                    };
+                    connection.explain(help::connection(snapshot.connected));
+                    if let Some(s) = &snapshot.status {
+                        ui.separator();
+                        // A battery tool that cannot show its own cost is asking to
+                        // be taken on faith (§13).
+                        ui.label(format!("own cost {:.1} wakeups/s", s.self_wakeups_per_sec))
+                            .explain(help::self_cost(s));
+                        // A recorder that stopped is a fault and says so louder; a
+                        // recorder that is running still says how much it has, because
+                        // the size it reports goes *down* when it breaks and that is
+                        // only legible against a number you have been watching.
+                        if let Some(t) = &s.trace {
+                            match &t.stopped {
+                                // Present tense, and it clears itself: the daemon
+                                // retries every minute, so this describes what is
+                                // wrong now rather than what went wrong once.
+                                Some(why) => {
+                                    ui.separator();
+                                    ui.label(
+                                        egui::RichText::new(if t.retrying {
+                                            format!("recording stopped: {why} (retrying)")
+                                        } else {
+                                            format!("recording stopped: {why}")
+                                        })
+                                        .color(egui::Color32::from_rgb(220, 120, 120)),
+                                    )
                                     .explain(help::trace(t));
+                                }
+                                // A recorder that recovered is healthy and its file
+                                // still has a hole. Two different facts, and only the
+                                // first of them stops being true.
+                                None if t.gaps > 0 => {
+                                    ui.separator();
+                                    ui.label(
+                                        egui::RichText::new(format!(
+                                            "recording {} events, {} gap{}",
+                                            t.records,
+                                            t.gaps,
+                                            if t.gaps == 1 { "" } else { "s" }
+                                        ))
+                                        .color(egui::Color32::from_rgb(210, 170, 90)),
+                                    )
+                                    .explain(help::trace(t));
+                                }
+                                None => {
+                                    ui.separator();
+                                    ui.label(format!("recording {} events", t.records))
+                                        .explain(help::trace(t));
+                                }
                             }
                         }
                     }
-                }
-                if let Some(err) = &snapshot.error {
-                    ui.separator();
-                    // Elided to one line, with the whole of it on hover. This
-                    // strip is a single row shared with the connection state and
-                    // the wakeup cost, and the daemon's errors are written to be
-                    // read rather than to fit — a config parse failure or a
-                    // rejected aggression factor is a sentence or two. Laid out
-                    // in full it pushed the row past the window and took the
-                    // things either side of it off the edge, so the price of one
-                    // long message was the rest of the footer.
-                    ui.colored_label(egui::Color32::from_rgb(220, 120, 60), elide(err, 64))
-                        .explain(format!(
-                            "{err}\n\nThe last thing that went wrong on the connection to the \
+                    if let Some(err) = &snapshot.error {
+                        ui.separator();
+                        // Elided to one line, with the whole of it on hover. This
+                        // strip is a single row shared with the connection state and
+                        // the wakeup cost, and the daemon's errors are written to be
+                        // read rather than to fit — a config parse failure or a
+                        // rejected aggression factor is a sentence or two. Laid out
+                        // in full it pushed the row past the window and took the
+                        // things either side of it off the edge, so the price of one
+                        // long message was the rest of the footer.
+                        ui.colored_label(egui::Color32::from_rgb(220, 120, 60), elide(err, 64))
+                            .explain(format!(
+                                "{err}\n\nThe last thing that went wrong on the connection to the \
                              daemon. It clears itself the moment the next reply arrives.",
-                        ));
-                }
-            });
+                            ));
+                    }
+                },
+                |ui| {
+                    // The only thing in this window that leaves the machine, and
+                    // it is the browser that does: the link is handed to the
+                    // desktop's own opener and nothing is fetched from here.
+                    if ui.button("Discord").explain(help::DISCORD).clicked() {
+                        ui.ctx().open_url(egui::OpenUrl::new_tab(DISCORD_URL));
+                    }
+                },
+            );
             ui.add_space(4.0);
         });
 
@@ -1293,6 +1314,14 @@ mod tests {
 
     const STATES: [Action; 3] =
         [Action::Restore, Action::Throttle { pct: 5 }, Action::Freeze { reclaim: false }];
+
+    /// The one address this window opens is plain HTTPS and carries nothing
+    /// that could track a click.
+    #[test]
+    fn the_discord_link_is_a_plain_https_address() {
+        assert!(DISCORD_URL.starts_with("https://"));
+        assert!(!DISCORD_URL.contains(['?', '#']));
+    }
 
     /// The exemption column has to distinguish "something is holding this app"
     /// from "here is why nothing is".

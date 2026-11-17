@@ -10,6 +10,12 @@ protocol and the CLI, and those are the three things a minor bump may move.
 
 ## [Unreleased]
 
+### Added
+
+* **A Discord button in the dashboard.** The footer of `dozed-gui` has a button
+  that opens the community's Discord in your browser. The dashboard hands the
+  address to the desktop's own opener and fetches nothing itself.
+
 ## [0.1.0] - 2026-11-17
 
 The first public release, and the first version that does the whole job.
