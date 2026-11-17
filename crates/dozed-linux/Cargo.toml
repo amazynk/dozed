@@ -1,0 +1,23 @@
+[package]
+name = "dozed-linux"
+description = "Linux-specific backends for dozed: cgroup v2 actuation, /proc sampling, identity."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+dozed-core = { workspace = true }
+rustix = { workspace = true }
+thiserror = { workspace = true }
+# The Throttle rung has to ask systemd to enable the cpu controller. See
+# `systemd.rs` for why that call lives on its own thread with its own runtime
+# rather than making the whole actuation path async for one rung.
+tokio = { workspace = true }
+tracing = { workspace = true }
+zbus = { workspace = true }
+
+[lints]
+workspace = true

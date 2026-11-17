@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- dozed, snoozed: the flake gone grey and thin, with a pause badge.
+       Two signals rather than one, because this is the state a user is most
+       likely to be in without remembering it — the whole reason a snooze expires
+       on its own. Grey alone would read as "disabled" on a dark panel where the
+       blue is already muted, so the badge carries the meaning and the colour
+       only supports it. -->
+  <g fill="none" stroke="#8a9199" stroke-width="0.95" stroke-linecap="round" stroke-linejoin="round">
+    <g>
+      <path d="M8 2.2 V13.8"/>
+      <path d="M6.5 3.7 L8 5.2 L9.5 3.7"/>
+      <path d="M6.5 12.3 L8 10.8 L9.5 12.3"/>
+    </g>
+    <g transform="rotate(60 8 8)">
+      <path d="M8 2.2 V13.8"/>
+      <path d="M6.5 3.7 L8 5.2 L9.5 3.7"/>
+      <path d="M6.5 12.3 L8 10.8 L9.5 12.3"/>
+    </g>
+    <g transform="rotate(120 8 8)">
+      <path d="M8 2.2 V13.8"/>
+      <path d="M6.5 3.7 L8 5.2 L9.5 3.7"/>
+      <path d="M6.5 12.3 L8 10.8 L9.5 12.3"/>
+    </g>
+  </g>
+  <!-- Bottom-right, where a panel overlay badge is conventionally read. -->
+  <circle cx="11.6" cy="11.6" r="4.1" fill="#3c4147"/>
+  <g fill="#e8ebee">
+    <rect x="10.1" y="9.7" width="1.15" height="3.8" rx="0.5"/>
+    <rect x="12.0" y="9.7" width="1.15" height="3.8" rx="0.5"/>
+  </g>
+</svg>

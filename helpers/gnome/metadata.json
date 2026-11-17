@@ -1,0 +1,9 @@
+{
+    "uuid": "dozed-focus-source@dozed",
+    "name": "dozed focus source",
+    "description": "Reports per-window visibility to the dozed daemon so it can tell a backgrounded app from one sitting on your second monitor.",
+    "shell-version": ["45", "46", "47", "48", "49"],
+    "url": "https://github.com/amazynk/dozed",
+    "session-modes": ["user"],
+    "version": 1
+}

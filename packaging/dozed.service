@@ -1,0 +1,53 @@
+[Unit]
+Description=dozed — freeze backgrounded apps so they stop waking the CPU
+Documentation=https://github.com/amazynk/dozed
+
+# A user unit, not a system one. dozed is same-UID only by design (DESIGN.md
+# §1): it never touches a process it does not own, which is what keeps the whole
+# thing unprivileged.
+#
+# graphical-session.target rather than default.target because there is nothing
+# to do without a desktop — no compositor helper to talk to, no X server to
+# read, and no windows to have opinions about.
+PartOf=graphical-session.target
+After=graphical-session.target dbus.socket
+Requires=dbus.socket
+
+# These belong in [Unit], not [Service] — systemd ignores them silently in the
+# wrong section, which `systemd-analyze verify` is the only thing that says.
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+# Dry-run is the default and live mode must be asked for explicitly. Switching
+# this to --live is a deliberate act, which is the point (§3): there is no way
+# to enter live mode by accident.
+ExecStart=%h/.local/bin/dozed --dry-run
+
+# Restart, but not into a crash loop. A daemon that cannot start is better off
+# stopped and visible in `systemctl --user status` than respawning forever.
+Restart=on-failure
+RestartSec=5s
+
+# SIGTERM is the clean-exit path, and clean exit thaws everything (§10.3). Give
+# it room to finish: a SIGKILL here would strand apps frozen until the next
+# start's sweep picks them up.
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+# A battery tool should not be the thing that costs battery, so it runs below
+# everything it is watching.
+Nice=5
+IOSchedulingClass=idle
+
+# It only ever needs to read /proc, write cgroup files it owns, and talk to the
+# session bus. None of that needs new privileges.
+NoNewPrivileges=yes
+# Deliberately NOT sandboxed further. ProtectHome, PrivateTmp and friends would
+# each break something dozed needs: it reads /proc for every app it manages and
+# writes to cgroup paths under the user slice. For the same reason this is not
+# a Flatpak (§15) — a sandboxed daemon cannot see or freeze host processes.
+
+[Install]
+WantedBy=graphical-session.target

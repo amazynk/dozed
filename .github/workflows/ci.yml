@@ -1,0 +1,109 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  # rustdoc builds each doctest binary under TMPDIR and then execs it. On a
+  # runner with /tmp mounted noexec that fails with EACCES, and rustdoc reports
+  # neither the cause nor which test — it exits 101 with an empty stderr, which
+  # reads as "the project is broken" and went unnoticed locally for a whole day.
+  TMPDIR: ${{ github.workspace }}/.ci-tmp
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the toolchain
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          rustup component add rustfmt clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - run: mkdir -p "$TMPDIR"
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      # Warnings are denied here and nowhere else: the workspace lints are set
+      # to warn so that a work-in-progress build stays readable, and this is
+      # where that leniency stops.
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      # The live cgroup and systemd tests are `#[ignore]`d and stay that way:
+      # they need a real user session with a session bus, which a runner has
+      # not got. What runs here is everything that does not.
+      - name: Test
+        run: cargo test --workspace
+
+      # The installer must not undo a deliberate choice. The unit file is where
+      # `--dry-run` becomes `--live`, and overwriting it on every run silently
+      # reverted a live daemon to dry-run — a battery tool quietly switching
+      # itself off, which is the failure hardest to notice.
+      - name: The installer must leave an edited unit alone
+        run: |
+          cargo build --release --workspace
+          ./packaging/test-install.sh
+
+      # Round-trips the shipped presets through the binary rather than through
+      # a unit test: write them out, read them back, validate. `--config
+      # /dev/null` would have passed trivially — an empty file parses fine and
+      # reports zero rules.
+      - name: The shipped config must survive a round trip
+        run: |
+          cargo run --quiet --bin dozed -- --write-default-config --config "$TMPDIR/shipped.toml"
+          test -s "$TMPDIR/shipped.toml"
+          cargo run --quiet --bin dozed -- --check --config "$TMPDIR/shipped.toml" | tee "$TMPDIR/check.out"
+          grep -q 'low-battery-foreground' "$TMPDIR/check.out"
+
+      # A config written by this version must have nothing to upgrade. The
+      # command only ever *adds* rules the shipped table has and the file does
+      # not, so a non-empty answer here means the two disagree about what this
+      # version ships — which is the state `upgrade-presets` exists to detect in
+      # somebody's months-old config, and must never be the state of a fresh one.
+      - name: A freshly written config is already up to date
+        run: |
+          cargo run --quiet --bin dozectl -- upgrade-presets --config "$TMPDIR/shipped.toml" \
+            | tee "$TMPDIR/upgrade.out"
+          grep -q 'every rule this version ships' "$TMPDIR/upgrade.out"
+
+  # The display-server backends, against real compositors rather than fixtures.
+  #
+  # A separate job because it installs a desktop's worth of packages and because
+  # its failure means something different: `check` failing is a broken build,
+  # this failing is a backend that does not work against the thing it claims to
+  # support. The Sway source spent its entire existence returning no windows —
+  # reading `node_type` where the socket says `type` — with eleven green unit
+  # tests certifying it, because the fixtures were hand-written to the same wrong
+  # name. Nothing but a real compositor was ever going to catch that.
+  backends:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      # `dbus-run-session` is not optional: without a private bus the daemon
+      # under test can take `org.dozed.Daemon` from another one and be fed that
+      # one's window reports, which is exactly how the broken Sway backend was
+      # first mistaken for a working one.
+      - name: Install the compositors
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            sway foot xvfb metacity xterm dbus-x11
+
+      - run: mkdir -p "$TMPDIR"
+
+      - name: Every backend this runner can start
+        run: ./packaging/verify-matrix.sh

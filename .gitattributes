@@ -1,0 +1,7 @@
+# The shell scripts and the unit file are run as they are checked out.
+* text=auto eol=lf
+
+# Keep generated files out of GitHub's language stats and diffs.
+Cargo.lock linguist-generated
+*.png binary
+*.jpg binary

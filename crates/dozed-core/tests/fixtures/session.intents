@@ -1,0 +1,24 @@
++120.000s thunderbird    doze      rule: cycled-mail
++180.000s slack          throttle  rule: chatty-apps
++360.000s editor         doze      rule: bg-idle
++1020.000s thunderbird    restore   maintenance
++1080.000s thunderbird    doze      maintenance
++1920.000s thunderbird    restore   maintenance
++1980.000s thunderbird    doze      maintenance
++2400.000s slack          restore   became-visible
++2580.000s player         doze      rule: bg-idle
++2640.000s slack          throttle  rule: chatty-apps
++2820.000s thunderbird    restore   maintenance
++2880.000s thunderbird    doze      maintenance
++3240.000s editor         restore   system-sleep
++3240.000s player         restore   system-sleep
++3240.000s slack          restore   system-sleep
++3240.000s thunderbird    restore   system-sleep
++3360.000s thunderbird    doze      rule: cycled-mail
++3420.000s slack          throttle  rule: chatty-apps
++3600.000s editor         doze      rule: bg-idle
++3600.000s player         doze      rule: bg-idle
++3720.000s thunderbird    restore   maintenance
++3780.000s thunderbird    doze      maintenance
+
+13 holds, 9 thaws, 1 interruptions

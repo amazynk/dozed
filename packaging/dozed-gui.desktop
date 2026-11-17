@@ -1,0 +1,23 @@
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=dozed
+GenericName=Background app freezer
+Comment=See what dozed is holding, what it has saved, and stop it
+# No path: the launcher resolves this against PATH, which for a desktop entry is
+# the session's own and does include ~/.local/bin on every desktop that reads
+# ~/.local/share/applications at all. The tray's "Open dashboard" is the case
+# that cannot rely on that — a systemd user service inherits systemd's PATH, not
+# a login shell's — and it resolves the binary beside the daemon instead.
+Exec=dozed-gui
+Icon=dozed
+Terminal=false
+# One main category (System) plus an additional one (Monitor). Two main
+# categories makes the entry appear twice in some menus, which
+# desktop-file-validate warns about.
+Categories=System;Monitor;
+Keywords=battery;power;freeze;suspend;cpu;wakeups;
+# It is a dashboard for a daemon, not a document editor: one window, no files.
+SingleMainWindow=true
+StartupNotify=true
+StartupWMClass=dozed-gui
