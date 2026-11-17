@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Chat on Discord
+    url: https://amazynk.com/discord/
+    about: Talk with other users and the developers.
+  - name: Report a security problem
+    url: https://github.com/amazynk/dozed/security/advisories/new
+    about: Please report vulnerabilities privately.
+  - name: What dozed is and how to install it
+    url: https://amazynk.com/dozed/
+    about: The site, with the film, the rules it ships and the install steps.

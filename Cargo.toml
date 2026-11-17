@@ -1,0 +1,64 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/dozed-core",
+    "crates/dozed-linux",
+    "crates/dozed",
+    "crates/dozectl",
+    "crates/dozed-gui",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "MIT"
+repository = "https://github.com/amazynk/dozed"
+homepage = "https://amazynk.com/dozed/"
+
+[workspace.dependencies]
+dozed-core = { path = "crates/dozed-core" }
+dozed-linux = { path = "crates/dozed-linux" }
+
+anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+clap = { version = "4", features = ["derive"] }
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+# `net` is here for one thing: `sockopt::socket_peercred`, so a client can check
+# that the daemon answering it is the same user. The daemon has always checked its
+# callers; the clients did not check the server, and `ipc::socket_path` falls back
+# to `/tmp` where nothing stops somebody else owning that name first.
+rustix = { version = "1", features = ["process", "fs", "net"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+# `test-util` is what gives tests a pausable clock, which is the only way to
+# assert a 60s scheduling property without waiting 60s.
+tokio = { version = "1", features = [
+    "test-util",
+    "rt-multi-thread",
+    "macros",
+    "net",
+    "signal",
+    "time",
+    "sync",
+    "io-util",
+    "fs",
+] }
+toml = "1"
+# EWMH on X11. Pure Rust, which is what lets the workspace keep
+# `#![forbid(unsafe_code)]` — the C bindings would not.
+x11rb = { version = "0.14", default-features = false, features = ["randr", "res", "xfixes"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = "thin"
+strip = true

@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Authors": [
+            { "Name": "dozed" }
+        ],
+        "Description": "Reports per-window visibility to the dozed daemon so it can tell a backgrounded app from one sitting on your second monitor.",
+        "Id": "dozed-focus-source",
+        "License": "MIT",
+        "Name": "dozed focus source",
+        "Version": "0.1.0"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

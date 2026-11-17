@@ -1,0 +1,62 @@
+name: Bug report
+description: dozed froze something it should not have, missed something it should have, or broke
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. For security problems, use [private reporting](https://github.com/amazynk/dozed/security/advisories/new) instead.
+
+        If an app is stuck right now, `dozectl thaw --all` restores everything, whatever the rules or the mode say.
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Before you open this
+      options:
+        - label: I searched the existing issues and this isn't one of them.
+          required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead. Name the app if one was involved.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: dozed version
+      description: The output of `dozed --version`, or the commit you built from
+    validations:
+      required: true
+  - type: input
+    id: session
+    attributes:
+      label: Distribution and desktop session
+      placeholder: e.g. Fedora 43, KDE Plasma 6.6 on Wayland · Arch, Sway · Debian 13, GNOME 48 on X11
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options: [dry-run, live, not sure]
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: dozectl status
+      description: The whole output. It says which focus source and which exemption sources are reporting.
+      render: text
+  - type: textarea
+    id: why
+    attributes:
+      label: dozectl why
+      description: For a wrong decision about one app, the output of `dozectl why <app> --rules`.
+      render: text
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Anything else
+      description: "`./packaging/collect-evidence.sh` gathers status, the journal and the per-app reasoning into one directory. Read it before attaching it: it names the apps you run."

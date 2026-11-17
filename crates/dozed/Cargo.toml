@@ -1,0 +1,32 @@
+[package]
+name = "dozed"
+description = "The dozed daemon: freezes backgrounded desktop apps so they stop waking the CPU."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+dozed-core = { workspace = true }
+dozed-linux = { workspace = true }
+
+anyhow = { workspace = true }
+clap = { workspace = true }
+futures-util = { workspace = true }
+rustix = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+toml = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+x11rb = { workspace = true }
+zbus = { workspace = true }
+ksni = "0.3"
+clap_mangen = "0.3.2"
+
+[lints]
+workspace = true

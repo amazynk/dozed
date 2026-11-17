@@ -1,0 +1,8 @@
+area: what changed, imperative, 72 characters at the outside
+
+Why this changed, and what it cost. Numbers where there are any: what
+was measured, on what machine, and what the alternative would have been.
+Standing facts go in DESIGN.md and are referenced by section here —
+a commit body is never edited again and nothing greps it.
+
+Tested: <exact command> -> <exact result>, or: not run; <reason>

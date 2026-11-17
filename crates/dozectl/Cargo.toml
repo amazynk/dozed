@@ -1,0 +1,27 @@
+[package]
+name = "dozectl"
+description = "Control and inspect the dozed daemon."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+dozed-core = { workspace = true }
+
+anyhow = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+# For `getuid`, to check that the daemon we reached is our own — see `connect`.
+rustix = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+# `suggest --write` emits a tuned config, so this crate has to serialise one.
+toml = { workspace = true }
+clap_complete = "4.6.9"
+clap_mangen = "0.3.2"
+
+[lints]
+workspace = true

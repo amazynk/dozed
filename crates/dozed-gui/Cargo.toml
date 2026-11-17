@@ -1,0 +1,31 @@
+[package]
+name = "dozed-gui"
+description = "egui dashboard for dozed: live timeline, per-app control, panic thaw."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+dozed-core = { workspace = true }
+
+anyhow = { workspace = true }
+# glow rather than wgpu: this is a status window that redraws when something
+# happens, and pulling in a Vulkan stack for it would be absurd for a tool whose
+# entire purpose is not spending power.
+eframe = { version = "0.33", default-features = false, features = [
+    "default_fonts",
+    "glow",
+    "wayland",
+    "x11",
+] }
+# For `SO_PEERCRED`, to check that the daemon we reached is our own. `std`'s
+# `UnixStream::peer_cred` is still unstable, so this is the stable route to it.
+rustix = { workspace = true }
+serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+
+[lints]
+workspace = true

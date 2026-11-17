@@ -1,0 +1,121 @@
+# A config for the verification run, not for living with.
+#
+# The shipped default waits five minutes before acting, and stretches that up to
+# four times longer while you are at the keyboard (DESIGN.md §8). Both are right
+# for daily use and useless for checking the thing works: you would sit in front
+# of a correctly-functioning dozed, watch it do nothing for twenty minutes, and
+# conclude it was broken.
+#
+# So this one is impatient. It is still dry-run, so it touches nothing either
+# way — it just brings the decisions forward into a coffee break.
+#
+#   dozed --dry-run --config packaging/verify.toml
+#
+# Exactly two settings differ from the shipped default, and they are the two that
+# set the pace: `base_grace` and `activity.active_factor`. The few defaults that
+# are written out below are restated for the reader, not overridden.
+#
+# The rule table is a shorter one than a fresh install gets: it has the core
+# rules and not the later exemptions, so use this file to watch dozed decide and
+# `dozed --write-default-config` to see everything it ships.
+#
+# Once you believe it, switch to ~/.config/dozed/config.toml for the real week.
+
+mode = "dry-run"
+
+[defaults]
+# 45s instead of 5m: long enough to be a real grace period you can watch expire,
+# short enough to see several in a coffee break.
+base_grace = "45s"
+# The default, restated: a frozen window still on screen reads as a crash, and
+# not doing that is exactly what we are checking. Worth seeing in the file you
+# are handing to a machine you do not own.
+freeze_visible = false
+
+[activity]
+# Default is 4.0, which multiplies a 45s grace back up to 3m while you are
+# typing. 2.0 keeps the anti-thrash behaviour observable without the wait.
+active_factor = 2.0
+# The default, restated: zero means act immediately once you are gone, which is
+# the single biggest source of the saving and the easiest thing to watch happen.
+away_factor = 0.0
+
+# No [battery] section: both of its knobs already sit at the shipped default,
+# and `low_factor` no longer does anything at all — writing it here would teach
+# a dead setting to everyone who copies this file as a starting point.
+
+# ---- the core of the rule table the default config ships --------------------
+# Ten of the shipped rules, enough to watch every kind of decision. The full
+# table, with the newer exemptions, is what `dozed --write-default-config` writes.
+
+[[rule]]
+name = "never-system"
+priority = 0
+match = { class = "system" }
+action = "never"
+
+[[rule]]
+name = "audio-exempt"
+priority = 10
+when = { playing_audio = true }
+action = "never"
+
+[[rule]]
+name = "inhibitor-exempt"
+priority = 11
+when = { has_inhibitor = true }
+action = "never"
+
+[[rule]]
+name = "fullscreen-exempt"
+priority = 12
+when = { fullscreen = true }
+action = "never"
+
+[[rule]]
+name = "dbus-owner-exempt"
+priority = 15
+when = { owns_dbus_name = true }
+action = "never"
+
+[[rule]]
+name = "long-job-exempt"
+priority = 20
+match = { class = "long-running-job" }
+action = "never"
+
+[[rule]]
+name = "never-vm-container-sync"
+priority = 25
+match = { app = [
+    "org.virt_manager.virt-manager", "virt-manager", "org.gnome.Boxes",
+    "VirtualBox", "vmware", "com.github.Podman-Desktop", "docker-desktop",
+    "syncthing", "org.gnome.DejaDup", "insync", "dropbox", "nextcloud",
+    "com.nextcloud.desktopclient.nextcloud", "megasync",
+    "org.qbittorrent.qBittorrent", "transmission-gtk",
+] }
+action = "never"
+
+[[rule]]
+name = "chatty-apps"
+priority = 50
+match = { app = [
+    "com.slack.Slack", "slack", "com.discordapp.Discord", "discord",
+    "org.telegram.desktop", "signal-desktop", "com.microsoft.Teams",
+    "element-desktop", "thunderbird", "org.mozilla.Thunderbird",
+] }
+when = { visibility = "hidden", for = "45s" }
+action = { throttle = 5 }
+
+[[rule]]
+name = "slow-to-wake"
+priority = 60
+match = { app = ["com.spotify.Client", "spotify", "com.valvesoftware.Steam", "steam"] }
+when = { visibility = "hidden", for = "3m" }
+action = "freeze"
+
+[[rule]]
+name = "bg-idle"
+priority = 100
+when = { visibility = "hidden", for = "45s" }
+action = "freeze"

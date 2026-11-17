@@ -1,0 +1,11 @@
+/target
+/.ci-tmp
+**/*.rs.bk
+*.pdb
+
+# local tool settings
+/.claude/
+
+# local dogfooding artifacts
+/traces
+/*.jsonl
