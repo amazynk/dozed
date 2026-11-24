@@ -15,6 +15,11 @@ protocol and the CLI, and those are the three things a minor bump may move.
 * **A Discord button in the dashboard.** The footer of `dozed-gui` has a button
   that opens the community's Discord in your browser. The dashboard hands the
   address to the desktop's own opener and fetches nothing itself.
+* **The other Amazynk apps, from the dashboard.** A **More apps** menu beside
+  the Discord button names Specular (a viewer for photos, RAW, video and
+  audio) and Pagebara (a PDF viewer and editor), and opens each one's page in
+  your browser, where its downloads are. Nothing is downloaded by the
+  dashboard, and it does not look for what is installed.
 
 ## [0.1.0] - 2026-11-17
 

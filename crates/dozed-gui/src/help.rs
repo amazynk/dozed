@@ -1011,6 +1011,18 @@ pub const THAW_ALL: &str = "Restore every app now. Ignores rules, ignores mode, 
 pub const DISCORD: &str = "Ask a question or talk to the people who make dozed. Opens the community's \
      Discord in your browser: the dashboard itself fetches nothing.";
 
+pub const MORE_APPS: &str = "The other apps from the people who make dozed. Each entry opens that app's page in \
+     your browser, where its downloads are: the dashboard itself fetches nothing.";
+
+pub const GET_SPECULAR: &str = "A GPU-drawn viewer for photos, camera RAW, HDR, video and audio, for Linux, Windows \
+     and macOS. Free and open source. Opens its page in your browser, where its downloads \
+     are: the dashboard itself fetches nothing.";
+
+pub const GET_PAGEBARA: &str = "A PDF viewer and editor that keeps your documents on your own machine: annotate, \
+     fill in forms, sign and redact. For Linux, Windows and macOS, free and open source. \
+     Opens its page in your browser, where its downloads are: the dashboard itself fetches \
+     nothing.";
+
 pub const RELOAD: &str = "Re-read `config.toml` from disk and apply it, without restarting the daemon or \
      dropping what it is holding. The same thing `dozectl reload` does.";
 

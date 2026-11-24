@@ -85,6 +85,31 @@ const GLOBAL_MODES: [(Mode, &str, &str); 2] = [
 /// could say who clicked.
 const DISCORD_URL: &str = "https://amazynk.com/discord/";
 
+/// The other apps from the people who make dozed, as the footer's menu offers
+/// them: the menu entry, the page it opens, and the hover.
+///
+/// Each address is the app's page on the project's website, which is where its
+/// downloads are and which says what it runs on. The dashboard does not
+/// download an app and does not look to see whether one is installed: it would
+/// have to reach the network or read somebody's disk to know, and a status
+/// window for a daemon has no business doing either. Like the Discord address,
+/// these carry no query and no fragment.
+///
+/// A named constant for the same reason [`GLOBAL_MODES`] is: it is the whole of
+/// what the menu can open, so it can be tested rather than read.
+const OTHER_APPS: [(&str, &str, &str); 2] = [
+    (
+        "Specular — a fast viewer for photos, RAW, video and audio",
+        "https://amazynk.com/specular/",
+        help::GET_SPECULAR,
+    ),
+    (
+        "Pagebara — a private PDF viewer and editor",
+        "https://amazynk.com/pagebara/",
+        help::GET_PAGEBARA,
+    ),
+];
+
 /// The snooze lengths the header offers, shortest first.
 ///
 /// A named constant for the same reason [`GLOBAL_MODES`] is: it is the whole of
@@ -665,12 +690,25 @@ impl eframe::App for Gui {
                     }
                 },
                 |ui| {
-                    // The only thing in this window that leaves the machine, and
-                    // it is the browser that does: the link is handed to the
-                    // desktop's own opener and nothing is fetched from here.
+                    // The only things in this window that leave the machine,
+                    // and it is the browser that does: each link is handed to
+                    // the desktop's own opener and nothing is fetched from here.
                     if ui.button("Discord").explain(help::DISCORD).clicked() {
                         ui.ctx().open_url(egui::OpenUrl::new_tab(DISCORD_URL));
                     }
+                    // A menu rather than a button per app: this side of the row
+                    // is paid for out of the status strip, and two more names
+                    // here would cost it most of a sentence.
+                    ui.menu_button("More apps", |ui| {
+                        for (entry, url, hover) in OTHER_APPS {
+                            if ui.button(entry).explain(hover).clicked() {
+                                ui.ctx().open_url(egui::OpenUrl::new_tab(url));
+                                ui.close();
+                            }
+                        }
+                    })
+                    .response
+                    .explain(help::MORE_APPS);
                 },
             );
             ui.add_space(4.0);
@@ -1321,6 +1359,30 @@ mod tests {
     fn the_discord_link_is_a_plain_https_address() {
         assert!(DISCORD_URL.starts_with("https://"));
         assert!(!DISCORD_URL.contains(['?', '#']));
+    }
+
+    /// The menu of other apps opens their pages on the project's own website
+    /// and nothing else, with nothing in the address that could track a click.
+    ///
+    /// Dozed is not in its own menu, and every entry leads with the name of the
+    /// app its address is for: an entry that opened the wrong page would be
+    /// worse than no menu.
+    #[test]
+    fn the_other_apps_open_their_own_pages_and_nothing_else() {
+        for (entry, url, hover) in OTHER_APPS {
+            let slug = url
+                .strip_prefix("https://amazynk.com/")
+                .and_then(|rest| rest.strip_suffix('/'))
+                .unwrap_or_else(|| panic!("{url} is not a page of the project's website"));
+            assert!(!slug.is_empty() && slug.chars().all(|c| c.is_ascii_lowercase()), "{url}");
+            assert_ne!(slug, "dozed");
+            assert!(
+                entry.to_lowercase().starts_with(slug),
+                "\"{entry}\" opens {url}, which is another app's page"
+            );
+            assert!(hover.contains("in your browser"), "{entry}: the hover says where it goes");
+            assert!(hover.contains("fetches nothing"), "{entry}: and that the dashboard stays put");
+        }
     }
 
     /// The exemption column has to distinguish "something is holding this app"
