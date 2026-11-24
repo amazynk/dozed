@@ -12,12 +12,11 @@
 use std::io::Read as _;
 use std::process::{Command, Stdio};
 
-/// The binary under test, as cargo built it next to this integration test.
-fn dozectl() -> std::path::PathBuf {
-    let mut p = std::env::current_exe().expect("test binary path");
-    p.pop(); // deps/
-    p.pop();
-    p.join("dozectl")
+/// The binary under test, where cargo says it built it for this integration
+/// test. Not worked out from the test's own path: where a test binary sits
+/// beside the program is cargo's business, and it has moved.
+fn dozectl() -> &'static str {
+    env!("CARGO_BIN_EXE_dozectl")
 }
 
 /// Run `dozectl <args>`, read one line, then drop the pipe — the `| head`
