@@ -10,6 +10,8 @@ protocol and the CLI, and those are the three things a minor bump may move.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-24
+
 ### Added
 
 * **A Discord button in the dashboard.** The footer of `dozed-gui` has a button
@@ -78,5 +80,6 @@ The first public release, and the first version that does the whole job.
 `DESIGN.md` §16 records what was verified against a live session or a real
 kernel, and — as importantly — what was not.
 
-[Unreleased]: https://github.com/amazynk/dozed/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/amazynk/dozed/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/amazynk/dozed/releases/tag/v0.1.1
 [0.1.0]: https://github.com/amazynk/dozed/releases/tag/v0.1.0

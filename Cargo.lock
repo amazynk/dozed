@@ -605,7 +605,7 @@ checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
 
 [[package]]
 name = "dozectl"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "chrono",
@@ -621,7 +621,7 @@ dependencies = [
 
 [[package]]
 name = "dozed"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -644,7 +644,7 @@ dependencies = [
 
 [[package]]
 name = "dozed-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -654,7 +654,7 @@ dependencies = [
 
 [[package]]
 name = "dozed-gui"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "dozed-core",
@@ -666,7 +666,7 @@ dependencies = [
 
 [[package]]
 name = "dozed-linux"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dozed-core",
  "rustix 1.1.4",
